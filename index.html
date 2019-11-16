@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>Ficareto</title>
+        <script>
+         async function derive(domain, pass) {
+             te = new TextEncoder();
+             baseKey = await crypto.subtle.importKey(
+                 "raw",
+                 te.encode(pass),
+                 {name: "PBKDF2"},
+                 false,
+                 ["deriveKey"]);
+             derivedKey = await crypto.subtle.deriveKey(
+                 {name: "PBKDF2", hash: "SHA-512", salt: te.encode(domain), iterations: 42},
+                 baseKey,
+                 {name: "AES-CBC", length: 128},
+                 true,
+                 ["encrypt"]);
+             result = await crypto.subtle.exportKey("raw", derivedKey);
+             return btoa(String.fromCharCode.apply(null, new Uint8Array(result)));
+         }
+         function render_derivative() {
+             domain = document.getElementById('domain').value;
+             pass = document.getElementById('pass').value;
+             derive(domain, pass).then((derived) => {
+                 input = document.getElementById('derived')
+                 input.value = derived;
+                 input.select();
+                 input.setSelectionRange(0, 99999);
+                 document.execCommand("copy");
+             });
+         }
+        </script>
+        <style>
+         .source {
+             width: 20em;
+         }
+         .app {
+             margin: 10%;
+         }
+        </style>
+    </head>
+    <body>
+        <div class="app">
+        Domain<br><input type="text" class="source" id="domain" autofocus/><br><br>
+        Password<br><input type="password" class="source" id="pass"/><br><br>
+        <button onclick="render_derivative();">Derive</button><br><br>
+        <input type="text" class="source result" id="derived" readonly/>
+        </div>
+    </body>
+</html>
