@@ -2,6 +2,29 @@
     <head>
         <title>Ficareto</title>
         <script>
+         function isiOS() {
+             return navigator.userAgent.match(/ipad|iphone/i);
+         }
+         function copyToClipboard(element) {
+             if (isiOS()) {
+                 element.contentEditable = true;
+                 var range = document.createRange();
+                 range.selectNodeContents(element);
+                 var selection = window.getSelection();
+                 selection.removeAllRanges();
+                 selection.addRange(range);
+                 element.setSelectionRange(0, 999999);
+             }
+             else {
+                 element.select();
+             }
+             document.execCommand("copy");
+         }
+         function copyRendered() {
+             input = document.getElementById('derived')
+             copyToClipboard(input);
+             alert("Copied");
+         }
          async function derive(domain, pass) {
              te = new TextEncoder();
              baseKey = await crypto.subtle.importKey(
@@ -22,12 +45,11 @@
          function render_derivative() {
              domain = document.getElementById('domain').value;
              pass = document.getElementById('pass').value;
+             input = document.getElementById('derived')
              derive(domain, pass).then((derived) => {
                  input = document.getElementById('derived')
                  input.value = derived;
-                 input.focus();
-                 input.select();
-                 document.execCommand("copy");
+                 document.getElementById("copybutton").focus();
              });
          }
         </script>
@@ -52,7 +74,8 @@
         Domain<br><input type="text" class="source" id="domain" autofocus/><br><br>
         Password<br><input type="password" class="source" id="pass"/><br><br>
         <button onclick="render_derivative();">Derive</button><br><br>
-        <input type="text" class="source result" id="derived" readonly/>
+        <input type="text" class="source result" id="derived" readonly /><br><br>
+        <button onclick="copyRendered();" id="copybutton">Copy</button>
         </div>
     </body>
 </html>
