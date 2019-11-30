@@ -21,7 +21,23 @@
              document.execCommand("copy");
          }
          function copyRendered() {
-             input = document.getElementById('derived')
+             var input = document.getElementById('derived')
+             copyToClipboard(input);
+             alert("Copied");
+         }
+         function togglePassword() {
+             var passInput = document.getElementById('pass');
+             var toggleButton = document.getElementById('toggle-pass');
+             if (passInput.type == "password") {
+                 passInput.type = "text";
+                 toggleButton.innerHTML = "Hide";
+             } else {
+                 passInput.type = "password";
+                 toggleButton.innerHTML = "Show";
+             }
+         }
+         function copyRenderedSafe() {
+             input = document.getElementById('derivedSafe')
              copyToClipboard(input);
              alert("Copied");
          }
@@ -43,13 +59,23 @@
              return btoa(String.fromCharCode.apply(null, new Uint8Array(result)));
          }
          function render_derivative() {
-             domain = document.getElementById('domain').value;
-             pass = document.getElementById('pass').value;
-             input = document.getElementById('derived')
+             var domain = document.getElementById('domain').value;
+             var pass = document.getElementById('pass').value;
+             var input = document.getElementById('derived')
+             var safeInput = document.getElementById('derivedSafe')
              derive(domain, pass).then((derived) => {
-                 input = document.getElementById('derived')
+                 derived = derived.replace(/=/g, "");
+                 var safe = derived.replace(/\//g, "").replace(/\+/g, "");
+                 derived = derived.replace(/\//g, "_").replace(/\+/g, "-");
                  input.value = derived;
                  document.getElementById("copybutton").focus();
+                 var safeDiv = document.getElementById("safe-option");
+                 var divStyle = "none";
+                 if (derived != safe) {
+                     safeInput.value = safe;
+                     divStyle = "block";
+                 }
+                 document.getElementById("safe-option").style.display = divStyle;
              });
          }
         </script>
@@ -65,17 +91,25 @@
              font-size: xx-large;
          }
          .app {
-             margin: 10%;
+             margin: 5%;
+         }
+         #safe-option {
+             display: none;
          }
         </style>
     </head>
     <body>
         <div class="app">
-        Domain<br><input type="text" class="source" id="domain" autofocus/><br><br>
-        Password<br><input type="password" class="source" id="pass"/><br><br>
-        <button onclick="render_derivative();">Derive</button><br><br>
-        <input type="text" class="source result" id="derived" readonly /><br><br>
-        <button onclick="copyRendered();" id="copybutton">Copy</button>
+            Domain<br><input type="text" class="source" id="domain" autofocus/><br><br>
+            Password<br><input type="password" class="source" id="pass"/>
+            <button onclick="togglePassword();" id="toggle-pass">Show</button><br><br>
+            <button onclick="render_derivative();">Derive</button><br><br>
+            <input type="text" class="source result" id="derived" readonly />
+            <button onclick="copyRendered();" id="copybutton">Copy</button><br><br>
+            <div id="safe-option">
+                <input type="text" class="source result" id="derivedSafe" readonly />
+                <button onclick="copyRenderedSafe();">Copy</button>
+            </div>
         </div>
     </body>
 </html>
