@@ -25,8 +25,8 @@
              derive(domain, pass).then((derived) => {
                  input = document.getElementById('derived')
                  input.value = derived;
+                 input.focus();
                  input.select();
-                 input.setSelectionRange(0, 99999);
                  document.execCommand("copy");
              });
          }
