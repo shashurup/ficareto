@@ -25,6 +25,11 @@
              copyToClipboard(input);
              alert("Copied");
          }
+         function copyRenderedExt() {
+             var input = document.getElementById('derived-ext')
+             copyToClipboard(input);
+             alert("Copied");
+         }
          function togglePassword() {
              var passInput = document.getElementById('pass');
              var toggleButton = document.getElementById('toggle-pass');
@@ -62,12 +67,14 @@
              var domain = document.getElementById('domain').value;
              var pass = document.getElementById('pass').value;
              var input = document.getElementById('derived')
+             var inputExt = document.getElementById('derived-ext')
              var safeInput = document.getElementById('derivedSafe')
              derive(domain, pass).then((derived) => {
                  derived = derived.replace(/=/g, "");
                  var safe = derived.replace(/\//g, "").replace(/\+/g, "");
                  derived = derived.replace(/\//g, "_").replace(/\+/g, "-");
                  input.value = derived;
+                 inputExt.value = derived + "!@#$";
                  document.getElementById("copybutton").focus();
                  var safeDiv = document.getElementById("safe-option");
                  var divStyle = "none";
@@ -106,6 +113,8 @@
             <button onclick="render_derivative();">Derive</button><br><br>
             <input type="text" class="source result" id="derived" readonly />
             <button onclick="copyRendered();" id="copybutton">Copy</button><br><br>
+            <input type="text" class="source result" id="derived-ext" readonly />
+            <button onclick="copyRenderedExt();" id="copybutton">Copy</button><br><br>
             <div id="safe-option">
                 <input type="text" class="source result" id="derivedSafe" readonly />
                 <button onclick="copyRenderedSafe();">Copy</button>
